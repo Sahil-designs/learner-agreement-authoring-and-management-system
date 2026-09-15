@@ -28,11 +28,7 @@ export function Acceptances() {
       <div className="page-head">
         <div>
           <h1>Acceptance lookup</h1>
-          <p>
-            Read-only. Search a learner ID to see which agreement version they accepted for each
-            enrolled course, and when. Acceptances are append-only — a re-consent adds a row, it never
-            replaces the original.
-          </p>
+          <p>Which agreement version each learner accepted, and when. Read-only.</p>
         </div>
       </div>
 
@@ -71,7 +67,6 @@ export function Acceptances() {
       ) : !record ? (
         <div className="card">
           <EmptyState
-            icon="🔍"
             title={`No learner found for “${submitted}”`}
             actions={<button className="btn" onClick={() => { setQuery(''); setSubmitted('') }}>Back to the directory</button>}
           >
@@ -85,7 +80,7 @@ export function Acceptances() {
 
       {viewing && (
         <Modal
-          title={`${viewing.agreement.name} — v${viewing.acceptance.version}`}
+          title={`${viewing.agreement.name} · v${viewing.acceptance.version}`}
           subtitle={`Exactly what ${viewing.learnerName} accepted on ${fmtDateTime(viewing.acceptance.acceptedAt)}`}
           size="modal-xl"
           onClose={() => setViewing(null)}
@@ -116,7 +111,7 @@ function LearnerDirectory({ learners, state, onPick }) {
         </div>
       </div>
       {!learners.length ? (
-        <EmptyState icon="👤" title="No acceptance records yet">
+        <EmptyState title="No acceptance records yet">
           Acceptance records are written when a learner accepts an agreement at enrollment, or
           re-accepts after a retroactive publish.
         </EmptyState>
@@ -128,7 +123,6 @@ function LearnerDirectory({ learners, state, onPick }) {
               <th>Name</th>
               <th>Enrolled agreements</th>
               <th>Acceptance records</th>
-              <th />
             </tr>
           </thead>
           <tbody>
@@ -141,11 +135,6 @@ function LearnerDirectory({ learners, state, onPick }) {
                   <td className="cell-title">{l.name}</td>
                   <td>{agreements.size}</td>
                   <td>{rows.length}</td>
-                  <td>
-                    <div className="row-actions">
-                      <button className="btn btn-sm" onClick={() => onPick(l.id)}>View record</button>
-                    </div>
-                  </td>
                 </tr>
               )
             })}
@@ -246,7 +235,7 @@ function LearnerResult({ record, state, onView, onNavigate }) {
               <div className="card-head" style={{ borderTop: '1px solid var(--line)', borderBottom: 0 }}>
                 <p className="small muted">
                   Two records, both kept. The original acceptance of v{e.acceptances[e.acceptances.length - 1].version} was
-                  never overwritten when v{e.current.version} was published retroactively — which is what lets
+                  never overwritten when v{e.current.version} was published retroactively, which is what lets
                   you prove what this learner agreed to at any point in time.
                 </p>
               </div>

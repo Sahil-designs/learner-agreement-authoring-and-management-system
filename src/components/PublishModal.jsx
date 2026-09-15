@@ -28,8 +28,8 @@ export function PublishModal({ agreement, diff, nextVersion, impact, prefillSumm
 
   return (
     <Modal
-      title={`Publish v${nextVersion} — ${agreement.name}`}
-      subtitle="Publishing appends a new version. Nothing already accepted by a learner is changed."
+      title={`Publish v${nextVersion}`}
+      subtitle={`${agreement.name}. Publishing appends a new version; nothing already accepted by a learner is changed.`}
       onClose={onClose}
       size="modal-lg"
       footer={
@@ -81,7 +81,7 @@ export function PublishModal({ agreement, diff, nextVersion, impact, prefillSumm
         <label className={`radio-card${retroactive ? ' selected' : ''}`}>
           <input type="radio" checked={retroactive} onChange={() => setRetroactive(true)} />
           <div>
-            <div className="radio-card-title">Apply retroactively — trigger re-consent</div>
+            <div className="radio-card-title">Apply retroactively and trigger re-consent</div>
             <div className="radio-card-desc">
               Existing learners are notified, shown what changed, and must accept again. Their original
               acceptance is kept on record; the new acceptance is stored alongside it.

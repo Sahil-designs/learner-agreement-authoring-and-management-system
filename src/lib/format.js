@@ -12,11 +12,11 @@ const DTT = new Intl.DateTimeFormat('en-IN', {
   hour: '2-digit', minute: '2-digit', hour12: true, timeZone: IST,
 })
 
-export const fmtDate = (iso) => (iso ? DT.format(new Date(iso)) : '—')
-export const fmtDateTime = (iso) => (iso ? DTT.format(new Date(iso)) : '—')
+export const fmtDate = (iso) => (iso ? DT.format(new Date(iso)) : '-')
+export const fmtDateTime = (iso) => (iso ? DTT.format(new Date(iso)) : '-')
 
 export function fmtRelative(iso) {
-  if (!iso) return '—'
+  if (!iso) return '-'
   const diff = Date.now() - new Date(iso).getTime()
   const mins = Math.round(diff / 60000)
   if (mins < 1) return 'just now'
@@ -30,8 +30,8 @@ export function fmtRelative(iso) {
 
 export const fmtNumber = (n) => new Intl.NumberFormat('en-IN').format(n ?? 0)
 
-// "v3" / "—" for an agreement that has never been published.
-export const fmtVersion = (v) => (v ? `v${v}` : '—')
+// "v3" / "-" for an agreement that has never been published.
+export const fmtVersion = (v) => (v ? `v${v}` : '-')
 
 // Stable-ish ids. No backend, so a counter plus a prefix is plenty.
 let seq = 0

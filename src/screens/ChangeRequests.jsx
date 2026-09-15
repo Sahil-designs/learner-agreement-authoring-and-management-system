@@ -39,7 +39,7 @@ export function RequestChangeModal({ agreement, onClose }) {
   const errors = {
     section: touched && !section ? 'Pick the section this affects.' : '',
     request: touched && !request.trim() ? 'Describe the change you need.' : '',
-    reason: touched && !reason.trim() ? 'Legal will ask why — say it here.' : '',
+    reason: touched && !reason.trim() ? 'Legal will ask why, so say it here.' : '',
   }
 
   const submit = () => {
@@ -90,7 +90,7 @@ export function RequestChangeModal({ agreement, onClose }) {
       </Field>
 
       <Field label="Why?" required error={errors.reason}
-        hint="Volumes, escalations, a regulatory deadline — whatever makes the case.">
+        hint="Volumes, escalations, a regulatory deadline: whatever makes the case.">
         <textarea className="textarea" value={reason} onChange={(e) => setReason(e.target.value)}
           placeholder="e.g. Roughly 20 support escalations a month, two of which became consumer forum notices." />
       </Field>
@@ -130,10 +130,7 @@ export function ChangeRequests() {
       <div className="page-head">
         <div>
           <h1>Change requests</h1>
-          <p>
-            Requests raised by product, operations and compliance against a specific section of a
-            specific agreement. Every one ends in a decision that is on the record.
-          </p>
+          <p>Raised against a specific section of a specific agreement, and tracked to a decision.</p>
         </div>
       </div>
 
@@ -162,7 +159,9 @@ export function ChangeRequests() {
             options={state.agreements.map((a) => ({ value: a.id, label: a.name }))} />
         </Field>
         <div className="filters-spacer" />
-        <div className="filters-count">{rows.length} of {state.changeRequests.length} shown</div>
+        {(status || agreementId) && (
+          <div className="filters-count">{rows.length} of {state.changeRequests.length} shown</div>
+        )}
         {(status || agreementId) && (
           <button className="btn btn-sm" style={{ marginBottom: 2 }}
             onClick={() => { setStatus(''); setAgreementId('') }}>Clear filters</button>
@@ -175,13 +174,12 @@ export function ChangeRequests() {
         ) : loading ? (
           <TableSkeleton rows={4} cols={5} />
         ) : !state.changeRequests.length ? (
-          <EmptyState icon="📥" title="No change requests yet">
+          <EmptyState title="No change requests yet">
             When someone outside legal needs a wording change, they raise it from the agreement library.
             It lands here instead of in a Slack thread.
           </EmptyState>
         ) : !rows.length ? (
           <EmptyState
-            icon="🔍"
             title="No requests match these filters"
             actions={<button className="btn" onClick={() => { setStatus(''); setAgreementId('') }}>Clear filters</button>}
           >
@@ -197,7 +195,6 @@ export function ChangeRequests() {
                 <th>Raised</th>
                 <th>Priority</th>
                 <th>Status</th>
-                <th />
               </tr>
             </thead>
             <tbody>
@@ -220,11 +217,6 @@ export function ChangeRequests() {
                     </td>
                     <td><Badge tone={PRIORITY_TONE[r.priority]}>{r.priority}</Badge></td>
                     <td><Badge tone={REQUEST_STATUS[r.status].tone}>{REQUEST_STATUS[r.status].label}</Badge></td>
-                    <td onClick={(e) => e.stopPropagation()}>
-                      <div className="row-actions">
-                        <button className="btn btn-sm" onClick={() => navigate('requests', r.id)}>Open</button>
-                      </div>
-                    </td>
                   </tr>
                 )
               })}
@@ -259,7 +251,7 @@ function RequestDetail({ request, agreement, canAction, onClose, onUpdate, onOpe
 
   return (
     <Modal
-      title={`${requestRef(request)} — ${request.section}`}
+      title={`${requestRef(request)} · ${request.section}`}
       subtitle={agreement?.name}
       onClose={onClose}
       size="modal-lg"
@@ -307,7 +299,7 @@ function RequestDetail({ request, agreement, canAction, onClose, onUpdate, onOpe
       </Field>
       <div className="grid-2">
         <Field label="Raised by">
-          <p>{userName(request.requestedBy)} — <span className="muted">{userById(request.requestedBy)?.title}</span></p>
+          <p>{userName(request.requestedBy)} · <span className="muted">{userById(request.requestedBy)?.title}</span></p>
           <p className="small muted" style={{ marginTop: 3 }}>{fmtDateTime(request.createdAt)}</p>
         </Field>
         <Field label="Section">

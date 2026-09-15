@@ -225,7 +225,7 @@ export function reducer(state, action) {
             type: 'version_published',
             agreementId,
             version: versionNumber,
-            summary: `Published v${versionNumber} — ${changeSummary}`,
+            summary: `Published v${versionNumber}: ${changeSummary}`,
           },
           retroactive && {
             type: 'reconsent_triggered',
@@ -307,7 +307,7 @@ export function reducer(state, action) {
           type: 'change_request_raised',
           agreementId: action.agreementId,
           requestId: request.id,
-          summary: `Raised change request ${request.reference} — ${action.section}`,
+          summary: `Raised change request ${request.reference}: ${action.section}`,
         }),
         'success',
         'Change request submitted. It is now in the legal team’s queue.',

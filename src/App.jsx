@@ -93,23 +93,16 @@ export default function App() {
 
           <nav className="nav">
             <div className="nav-label">Agreements</div>
-            <NavItem icon="📄" label="Agreement library" active={['library', 'editor', 'history'].includes(route.screen)}
+            <NavItem label="Agreement library" active={['library', 'editor', 'history'].includes(route.screen)}
               onClick={() => navigate('library')} />
-            <NavItem icon="📥" label="Change requests" active={route.screen === 'requests'}
+            <NavItem label="Change requests" active={route.screen === 'requests'}
               count={openRequests} onClick={() => navigate('requests')} />
 
             <div className="nav-label">Compliance</div>
-            <NavItem icon="🗒" label="Audit log" active={route.screen === 'audit'} onClick={() => navigate('audit')} />
-            <NavItem icon="✅" label="Acceptance lookup" active={route.screen === 'acceptances'}
+            <NavItem label="Audit log" active={route.screen === 'audit'} onClick={() => navigate('audit')} />
+            <NavItem label="Acceptance lookup" active={route.screen === 'acceptances'}
               onClick={() => navigate('acceptances')} />
 
-            {pendingApprovals > 0 && (
-              <>
-                <div className="nav-label">Awaiting you</div>
-                <NavItem icon="⏳" label="Drafts pending approval" count={pendingApprovals}
-                  onClick={() => navigate('library')} />
-              </>
-            )}
           </nav>
 
           <div className="who">
@@ -133,10 +126,9 @@ export default function App() {
   )
 }
 
-function NavItem({ icon, label, active, count, onClick }) {
+function NavItem({ label, active, count, onClick }) {
   return (
     <button className={`nav-item${active ? ' active' : ''}`} onClick={onClick}>
-      <span className="nav-icon">{icon}</span>
       <span>{label}</span>
       {count > 0 && <span className="nav-count">{count}</span>}
     </button>
@@ -150,7 +142,7 @@ function NavItem({ icon, label, active, count, onClick }) {
 function DevStrip({ state, dispatch, user }) {
   return (
     <div className="devstrip">
-      <div className="devstrip-title">Demo controls — not product</div>
+      <div className="devstrip-title">Demo controls (not product)</div>
 
       <label htmlFor="role-switch">Acting as</label>
       <select
@@ -159,7 +151,7 @@ function DevStrip({ state, dispatch, user }) {
         onChange={(e) => dispatch({ type: 'SET_USER', userId: e.target.value })}
       >
         {USERS.map((u) => (
-          <option key={u.id} value={u.id}>{u.name} — {ROLE_LABEL[u.role]}</option>
+          <option key={u.id} value={u.id}>{u.name} ({ROLE_LABEL[u.role]})</option>
         ))}
       </select>
 

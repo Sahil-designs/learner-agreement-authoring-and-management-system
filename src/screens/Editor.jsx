@@ -24,7 +24,6 @@ export function Editor() {
       <div className="page">
         <div className="card">
           <EmptyState
-            icon="🔎"
             title="That agreement no longer exists"
             actions={<button className="btn btn-primary" onClick={() => navigate('library')}>Back to the library</button>}
           >
@@ -150,7 +149,7 @@ function EditorInner({ agreement, state, dispatch, user, navigate, route }) {
           <span className="metastrip-label">Editing</span>
           <span className="metastrip-value">
             {draft
-              ? `Draft on v${draft.baseVersion ?? '—'} · saved ${fmtRelative(draft.savedAt)} by ${userName(draft.savedBy)}`
+              ? `Draft on v${draft.baseVersion ?? '-'} · saved ${fmtRelative(draft.savedAt)} by ${userName(draft.savedBy)}`
               : `Working copy of ${fmtVersion(status.liveVersionNumber)} · not saved yet`}
           </span>
         </div>
@@ -265,7 +264,7 @@ function ApprovalBar({ draft, submittedByMe, awaiting, onSubmit, onApprove, onDi
       <div className="approvalbar approvalbar-amber">
         <span>
           Awaiting approval · submitted by <strong>{userName(draft.submittedForApproval.by)}</strong>
-          {submittedByMe && ' — a second legal owner must approve before it can be published'}
+          {submittedByMe && '. A second legal owner must approve before it can be published'}
         </span>
         <div className="spacer" />
         {!submittedByMe && <button className="btn btn-sm btn-primary" onClick={onApprove}>Approve</button>}
@@ -276,7 +275,7 @@ function ApprovalBar({ draft, submittedByMe, awaiting, onSubmit, onApprove, onDi
 
   return (
     <div className="approvalbar">
-      <span className="muted">Not submitted for approval — you can publish directly, or get a second pair of eyes.</span>
+      <span className="muted">Not submitted for approval. You can publish directly, or get a second pair of eyes.</span>
       <div className="spacer" />
       <button className="btn btn-sm" onClick={onSubmit}>Submit for approval</button>
       {discard}
@@ -289,7 +288,7 @@ function PinnedRequest({ request, onClose, onDone }) {
   return (
     <div className="panel request-pin">
       <div className="panel-head">
-        <h4>📌 {requestRef(request)}</h4>
+        <h4>{requestRef(request)}</h4>
         <Badge tone={REQUEST_STATUS[request.status].tone}>{REQUEST_STATUS[request.status].label}</Badge>
         <button className="btn btn-sm btn-ghost" onClick={onClose} style={{ marginLeft: 'auto' }}>Unpin</button>
       </div>
@@ -338,7 +337,7 @@ function PreviewModal({ agreement, doc, version, isDraft, live, diff, onClose })
       title={agreement.name}
       subtitle={
         isDraft
-          ? `Working draft — would publish as v${version}.`
+          ? `Working draft. Would publish as v${version}.`
           : `Live version (v${version}), as a learner sees it at enrollment.`
       }
       size="modal-xl"
@@ -347,8 +346,8 @@ function PreviewModal({ agreement, doc, version, isDraft, live, diff, onClose })
         <>
           <span className="modal-foot-note">
             {tab === 'learner'
-              ? 'Preview only — the learner-side viewer itself is outside this prototype’s scope.'
-              : `v${live?.version ?? '—'} stays exactly as it is until you publish.`}
+              ? 'Preview only. The learner-side viewer itself is outside this prototype\'s scope.'
+              : `v${live?.version ?? '-'} stays exactly as it is until you publish.`}
           </span>
           <button className="btn btn-primary" onClick={onClose}>Close</button>
         </>
@@ -375,7 +374,6 @@ function PreviewModal({ agreement, doc, version, isDraft, live, diff, onClose })
         <div className="learner-frame">
           <div className="learner-device">
             <div className="learner-bar">
-              <span>📘</span>
               <span>{agreement.name}</span>
             </div>
             <div className="learner-body">
@@ -402,7 +400,7 @@ function PreviewModal({ agreement, doc, version, isDraft, live, diff, onClose })
       ) : changed ? (
         <DiffView diff={diff} leftLabel={live ? `v${live.version} (live)` : 'Empty'} rightLabel="Working draft" />
       ) : (
-        <EmptyState icon="＝" title="Nothing has changed yet">
+        <EmptyState title="Nothing has changed yet">
           This draft is identical to the live version. Edit a clause and look again.
         </EmptyState>
       )}

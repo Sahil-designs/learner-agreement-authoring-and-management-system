@@ -111,7 +111,7 @@ export function EditorToolbar({ canEdit, surfaceRef, onInsert }) {
     <div className="toolbar">
       <button className="tool tool-b" onMouseDown={swallow} onClick={() => exec('bold')} disabled={!canEdit} title="Bold (Ctrl+B)">B</button>
       <button className="tool tool-i" onMouseDown={swallow} onClick={() => exec('italic')} disabled={!canEdit} title="Italic (Ctrl+I)">I</button>
-      <button className="tool" onMouseDown={swallow} onClick={link} disabled={!canEdit} title="Insert link">🔗</button>
+      <button className="tool" onMouseDown={swallow} onClick={link} disabled={!canEdit} title="Insert link">Link</button>
       <button className="tool" onMouseDown={swallow} onClick={() => exec('removeFormat')} disabled={!canEdit} title="Clear formatting">Clear</button>
 
       <span className="tool-sep" />
@@ -137,9 +137,6 @@ export function EditorToolbar({ canEdit, surfaceRef, onInsert }) {
         )}
       </div>
 
-      <span className="toolbar-hint">
-        Hover any clause for move, indent and delete · Tab and Shift+Tab to indent
-      </span>
     </div>
   )
 }

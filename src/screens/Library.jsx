@@ -37,11 +37,7 @@ export function Library() {
       <div className="page-head">
         <div>
           <h1>Agreement library</h1>
-          <p>
-            Every learner agreement, by course and plan. Content varies by course <strong>×</strong> plan,
-            so a new combination starts by duplicating the closest existing agreement rather than being
-            written from scratch.
-          </p>
+          <p>Every learner agreement, by course and plan.</p>
         </div>
         <div className="page-head-actions">
           <button className="btn" onClick={() => navigate('audit')}>Audit log</button>
@@ -96,9 +92,11 @@ export function Library() {
                 value={filters.query} onChange={(e) => set('query', e.target.value)} />
             </Field>
             <div className="filters-spacer" />
-            <div className="filters-count">
-              {rows.length} of {state.agreements.length} shown
-            </div>
+            {filtered && (
+              <div className="filters-count">
+                {rows.length} of {state.agreements.length} shown
+              </div>
+            )}
             {filtered && (
               <button className="btn btn-sm" style={{ marginBottom: 2 }} onClick={() => setFilters(BLANK_FILTERS)}>
                 Clear filters
@@ -113,7 +111,6 @@ export function Library() {
               <TableSkeleton rows={6} cols={6} />
             ) : !state.agreements.length ? (
               <EmptyState
-                icon="📄"
                 title="No agreements yet"
                 actions={canEdit && <button className="btn btn-primary" onClick={() => setCreating({ mode: 'blank' })}>Create the first agreement</button>}
               >
@@ -122,7 +119,6 @@ export function Library() {
               </EmptyState>
             ) : !rows.length ? (
               <EmptyState
-                icon="🔍"
                 title="No agreements match these filters"
                 actions={
                   <>
@@ -224,11 +220,6 @@ function CoverageMatrix({ agreements, canEdit, onOpen, onCreate }) {
   const matrix = coverageMatrix(agreements)
   return (
     <>
-      <div className="callout mb-16">
-        Agreement content varies by <strong>course × plan</strong>, not by course alone — the same course
-        under an NSDC plan carries certification conditions that the standard plan does not. This view
-        shows which combinations exist. An empty cell is a gap, and filling it starts from a duplicate.
-      </div>
       <div className="card" style={{ overflow: 'hidden' }}>
         <table className="coverage">
           <thead>
@@ -289,7 +280,7 @@ function NewAgreementModal({ initial, agreements, onClose, onCreate }) {
 
   // Suggest a name so nobody has to invent one mid-demo.
   const suggested =
-    courseId && planId ? `${courseName(courseId)} — ${planName(planId)}` : ''
+    courseId && planId ? `${courseName(courseId)}: ${planName(planId)}` : ''
   const finalName = name.trim() || suggested
 
   const errors = {
@@ -360,7 +351,7 @@ function NewAgreementModal({ initial, agreements, onClose, onCreate }) {
 
       <Field label="Agreement name" required error={errors.name}
         hint={!name.trim() && suggested ? `Will be saved as “${suggested}”` : undefined}>
-        <input className="input" value={name} placeholder={suggested || 'e.g. Digital Marketing — NSDC Certified'}
+        <input className="input" value={name} placeholder={suggested || 'e.g. Digital Marketing: NSDC Certified'}
           onChange={(e) => setName(e.target.value)} />
       </Field>
 

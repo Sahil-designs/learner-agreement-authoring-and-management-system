@@ -1,4 +1,4 @@
-// "Who did what, when" — the answer to the question the Google Doc could never
+// "Who did what, when": the answer to the question the Google Doc could never
 // answer.
 
 import { useMemo, useState } from 'react'
@@ -37,10 +37,7 @@ export function AuditLog() {
       <div className="page-head">
         <div>
           <h1>Audit log</h1>
-          <p>
-            Every change to every agreement, in one place. Entries are written by the same action that
-            makes the change, so the log cannot drift out of step with what actually happened.
-          </p>
+          <p>Every change to every agreement, written by the action that made it.</p>
         </div>
       </div>
 
@@ -79,11 +76,11 @@ export function AuditLog() {
         ) : loading ? (
           <TableSkeleton rows={7} cols={4} />
         ) : !state.audit.length ? (
-          <EmptyState icon="🗒" title="Nothing has happened yet">
+          <EmptyState title="Nothing has happened yet">
             The audit log fills itself as agreements are created, drafted, published and requested.
           </EmptyState>
         ) : !rows.length ? (
-          <EmptyState icon="🔍" title="No entries match these filters"
+          <EmptyState title="No entries match these filters"
             actions={<button className="btn" onClick={() => setFilters(BLANK)}>Clear filters</button>}>
             Try widening the date range or clearing the event type.
           </EmptyState>

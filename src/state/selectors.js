@@ -9,9 +9,9 @@ export const courseById = (id) => COURSES.find((c) => c.id === id)
 export const planById = (id) => PLANS.find((p) => p.id === id)
 export const userById = (id) => USERS.find((u) => u.id === id)
 
-export const courseName = (id) => courseById(id)?.name || '—'
-export const planName = (id) => planById(id)?.name || '—'
-export const userName = (id) => userById(id)?.name || '—'
+export const courseName = (id) => courseById(id)?.name || '-'
+export const planName = (id) => planById(id)?.name || '-'
+export const userName = (id) => userById(id)?.name || '-'
 
 export const isLegalOwner = (user) => user?.role === 'legal_owner'
 

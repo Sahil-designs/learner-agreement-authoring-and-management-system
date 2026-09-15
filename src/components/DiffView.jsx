@@ -151,7 +151,7 @@ export function DiffView({ diff, leftLabel, rightLabel, mode = 'split', onlyChan
             <tbody>
               <tr>
                 <td colSpan={mode === 'split' ? 4 : 2} className="diff-annexure-head">
-                  <span>📎 {anx.title}</span>
+                  <span>{anx.title}</span>
                   {anx.previousTitle && <span className="small muted">renamed from “{anx.previousTitle}”</span>}
                   {anx.status === 'added' && <Badge tone="green">Annexure added</Badge>}
                   {anx.status === 'removed' && <Badge tone="red">Annexure removed</Badge>}

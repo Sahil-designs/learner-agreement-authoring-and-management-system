@@ -58,7 +58,7 @@ export function useDocEditing() {
 // ------------------------------------------------------------------- surface
 
 const PLACEHOLDER = {
-  heading: 'Section heading, e.g. PART C — REFUND AND CANCELLATION',
+  heading: 'Section heading, e.g. PART C: REFUND AND CANCELLATION',
   clause: 'Clause text…',
   para: 'Paragraph text…',
 }
@@ -193,17 +193,15 @@ export function DocEditor({ doc, onChange, onDirty, canEdit, register, readLates
 
       {!canEdit && (
         <div className="editor-readonly-note">
-          <span>🔒</span>
           <span>
-            Read-only. Your role can view every agreement but cannot change content — use
-            <strong> Request change</strong> to send an edit to the legal team.
+            Read-only. Your role can view every agreement but cannot change content. Use
+            <strong>Request change</strong> to send an edit to the legal team.
           </span>
         </div>
       )}
 
       {annexure && (
         <div className="editor-readonly-note" style={{ background: 'var(--accent-soft)', color: 'var(--accent-ink)', borderColor: '#c9d6f8' }}>
-          <span>📎</span>
           <span>Editing annexure: <strong>{annexure.title}</strong></span>
         </div>
       )}
@@ -293,7 +291,7 @@ function BlockRow({ block, index, total, canEdit, flash, register, onFocus, onKe
                         html={cell}
                         canEdit={canEdit}
                         register={register}
-                        placeholder={r === 0 ? 'Column' : '—'}
+                        placeholder={r === 0 ? 'Column' : '-'}
                       />
                     </Cell>
                   )
@@ -388,7 +386,7 @@ export function AnnexurePanel({ doc, onChange, canEdit, activeId, onSelect, read
     const letter = String.fromCharCode(65 + n)
     update((list) => [
       ...list,
-      { id, title: `Annexure ${letter} — Untitled`, blocks: [newBlock('para')] },
+      { id, title: `Annexure ${letter}: Untitled`, blocks: [newBlock('para')] },
     ])
     onSelect(id)
     setRenaming(id)
@@ -471,8 +469,8 @@ export function AnnexurePanel({ doc, onChange, canEdit, activeId, onSelect, read
         {!annexures.length && (
           <div className="panel-body">
             <p className="panel-note">
-              No annexures on this agreement yet. Annexures are separate documents — a fee schedule,
-              an assessment rubric — attached to this agreement and versioned with it.
+              No annexures on this agreement yet. Annexures are separate documents (a fee schedule, an assessment rubric)
+              attached to this agreement and versioned with it.
             </p>
           </div>
         )}

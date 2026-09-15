@@ -61,10 +61,9 @@ export function Modal({ title, subtitle, onClose, children, footer, size = '' })
   )
 }
 
-export function EmptyState({ icon = '◦', title, children, actions }) {
+export function EmptyState({ title, children, actions }) {
   return (
     <div className="state">
-      <div className="state-icon">{icon}</div>
       <h3>{title}</h3>
       {children && <p>{children}</p>}
       {actions && <div className="state-actions">{actions}</div>}
@@ -75,11 +74,9 @@ export function EmptyState({ icon = '◦', title, children, actions }) {
 export function ErrorState({ onRetry, what = 'this list' }) {
   return (
     <div className="state state-error">
-      <div className="state-icon">⚠</div>
-      <h3>Couldn’t load {what}</h3>
+      <h3>Couldn't load {what}</h3>
       <p>
-        The request failed before any data came back. Nothing has been changed. Retry, or carry on —
-        other screens are unaffected.
+        The request failed before any data came back. Nothing has been changed. Retry, or carry on; other screens are unaffected.
       </p>
       <div className="state-actions">
         <button className="btn btn-primary" onClick={onRetry}>Retry</button>
@@ -128,14 +125,6 @@ function Toast({ toast, onDismiss }) {
     </div>
   )
 }
-
-export const Stat = ({ label, figure, note }) => (
-  <div className="stat">
-    <div className="stat-label">{label}</div>
-    <div className="stat-figure">{figure}</div>
-    {note && <div className="stat-note">{note}</div>}
-  </div>
-)
 
 export const Segmented = ({ value, onChange, options }) => (
   <div className="segmented">

@@ -27,7 +27,7 @@ export function VersionHistory() {
     return (
       <div className="page">
         <div className="card">
-          <EmptyState icon="🔎" title="That agreement no longer exists"
+          <EmptyState title="That agreement no longer exists"
             actions={<button className="btn btn-primary" onClick={() => navigate('library')}>Back to the library</button>}>
             It may have been removed, or the link may be stale.
           </EmptyState>
@@ -60,10 +60,7 @@ export function VersionHistory() {
             <button onClick={() => navigate('editor', agreement.id)}>{agreement.name}</button>
           </div>
           <h1>Version history</h1>
-          <p>
-            Every published version of <strong>{agreement.name}</strong>, with what changed, who
-            published it, and whether existing learners had to accept again.
-          </p>
+          <p>Every published version of <strong>{agreement.name}</strong>.</p>
         </div>
         <div className="page-head-actions">
           <button className="btn btn-primary" disabled={!canCompare} onClick={() => setDiffing([a, b])}>
@@ -97,7 +94,6 @@ export function VersionHistory() {
       {!versions.length ? (
         <div className="card">
           <EmptyState
-            icon="🕘"
             title="Nothing published yet"
             actions={<button className="btn btn-primary" onClick={() => navigate('editor', agreement.id)}>Open the draft</button>}
           >
@@ -171,14 +167,14 @@ export function VersionHistory() {
 
       {viewing && (
         <Modal
-          title={`${agreement.name} — v${viewing.version}`}
+          title={`${agreement.name} · v${viewing.version}`}
           subtitle={`Published ${fmtDateTime(viewing.publishedAt)} by ${userName(viewing.publishedBy)} · read-only`}
           size="modal-xl"
           onClose={() => setViewing(null)}
           footer={
             <>
               <span className="modal-foot-note">
-                Past versions are read-only. Rolling back is deliberately not supported — a correction
+                Past versions are read-only. Rolling back is deliberately not supported. A correction
                 is published as a new version so the record stays complete.
               </span>
               <button className="btn" onClick={() => setViewing(null)}>Close</button>
@@ -233,7 +229,7 @@ function DiffModal({ agreement, from, to, onClose }) {
       </div>
 
       <div className="callout mb-16">
-        <strong>v{to}</strong> — {vTo.changeSummary}
+        <strong>v{to}</strong>: {vTo.changeSummary}
       </div>
 
       <DiffView
