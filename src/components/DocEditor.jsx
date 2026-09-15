@@ -187,19 +187,9 @@ export function DocEditor({ doc, onChange, onDirty, canEdit, register, readLates
     }
   }
 
-  const focusedBlock = blocks.find((b) => b.id === focusedId)
-
   return (
     <div className="card">
-      <EditorToolbar
-        canEdit={canEdit}
-        surfaceRef={surfaceRef}
-        onInsert={insertAfterFocused}
-        onIndent={() => focusedId && setLevelBy(focusedId, 1)}
-        onOutdent={() => focusedId && setLevelBy(focusedId, -1)}
-        hasFocus={!!focusedBlock && focusedBlock.type === 'clause'}
-        focusedLevel={focusedBlock?.level || 0}
-      />
+      <EditorToolbar canEdit={canEdit} surfaceRef={surfaceRef} onInsert={insertAfterFocused} />
 
       {!canEdit && (
         <div className="editor-readonly-note">

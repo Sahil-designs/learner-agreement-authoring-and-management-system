@@ -16,13 +16,15 @@ import { ChangeRequests } from './screens/ChangeRequests.jsx'
 import { AuditLog } from './screens/AuditLog.jsx'
 import { Acceptances } from './screens/Acceptances.jsx'
 
+// Each screen owns its own header. There is no separate topbar repeating the
+// screen name back at you.
 const SCREENS = {
-  library: { component: Library, title: 'Agreement library', sub: 'Author, version and publish learner agreements' },
-  editor: { component: Editor, title: 'Agreement editor', sub: 'Draft, preview and publish' },
-  history: { component: VersionHistory, title: 'Version history', sub: 'Every version, and what changed between them' },
-  requests: { component: ChangeRequests, title: 'Change requests', sub: 'Tracked requests from product, ops and compliance' },
-  audit: { component: AuditLog, title: 'Audit log', sub: 'Who did what, when' },
-  acceptances: { component: Acceptances, title: 'Acceptance lookup', sub: 'What each learner accepted, and when' },
+  library: Library,
+  editor: Editor,
+  history: VersionHistory,
+  requests: ChangeRequests,
+  audit: AuditLog,
+  acceptances: Acceptances,
 }
 
 // ------------------------------------------------------------------- routing
@@ -70,7 +72,7 @@ export default function App() {
   )
 
   const value = useMemo(() => ({ state, dispatch, user, route, navigate }), [state, user, route, navigate])
-  const Screen = SCREENS[route.screen].component
+  const Screen = SCREENS[route.screen]
 
   const openRequests = state.changeRequests.filter((r) => r.status === 'open' || r.status === 'in_review').length
   const pendingApprovals = state.agreements.filter((a) => agreementStatus(a).awaitingApproval).length
@@ -110,25 +112,18 @@ export default function App() {
             )}
           </nav>
 
+          <div className="who">
+            <div className="avatar">{user.initials}</div>
+            <div>
+              <div className="who-name">{user.name}</div>
+              <div className="who-role">{ROLE_LABEL[user.role]}</div>
+            </div>
+          </div>
+
           <DevStrip state={state} dispatch={dispatch} user={user} />
         </aside>
 
         <main className="main">
-          <header className="topbar">
-            <div>
-              <div className="topbar-title">{SCREENS[route.screen].title}</div>
-              <div className="topbar-sub">{SCREENS[route.screen].sub}</div>
-            </div>
-            <div className="topbar-spacer" />
-            <div className="who">
-              <div className="avatar">{user.initials}</div>
-              <div>
-                <div className="who-name">{user.name}</div>
-                <div className="who-role">{ROLE_LABEL[user.role]}</div>
-              </div>
-            </div>
-          </header>
-
           <Screen />
         </main>
       </div>

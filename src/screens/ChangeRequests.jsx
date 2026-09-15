@@ -137,28 +137,29 @@ export function ChangeRequests() {
         </div>
       </div>
 
-      <div className="grid-3 mb-16" style={{ gridTemplateColumns: 'repeat(4, 1fr)' }}>
-        {counts.map((c) => (
-          <button
-            key={c.value}
-            className="stat"
-            style={{ textAlign: 'left', cursor: 'pointer', borderColor: status === c.value ? 'var(--accent)' : undefined }}
-            onClick={() => setStatus(status === c.value ? '' : c.value)}
-          >
-            <div className="stat-label">{c.label}</div>
-            <div className="stat-figure">{c.n}</div>
-            <div className="stat-note">{status === c.value ? 'Filtering by this' : 'Click to filter'}</div>
-          </button>
-        ))}
-      </div>
-
       <div className="filters">
+        {/* Status counts and the status filter are the same control -- showing a
+            count and then a separate dropdown to filter on it was saying the
+            same thing twice. */}
+        <Field label="Status">
+          <div className="chipfilter">
+            <button className={!status ? 'active' : ''} onClick={() => setStatus('')}>
+              All <span>{state.changeRequests.length}</span>
+            </button>
+            {counts.map((c) => (
+              <button
+                key={c.value}
+                className={status === c.value ? 'active' : ''}
+                onClick={() => setStatus(status === c.value ? '' : c.value)}
+              >
+                {c.label} <span>{c.n}</span>
+              </button>
+            ))}
+          </div>
+        </Field>
         <Field label="Agreement">
           <Select value={agreementId} onChange={setAgreementId} placeholder="All agreements"
             options={state.agreements.map((a) => ({ value: a.id, label: a.name }))} />
-        </Field>
-        <Field label="Status">
-          <Select value={status} onChange={setStatus} placeholder="Any status" options={STATUS_FILTERS} />
         </Field>
         <div className="filters-spacer" />
         <div className="filters-count">{rows.length} of {state.changeRequests.length} shown</div>

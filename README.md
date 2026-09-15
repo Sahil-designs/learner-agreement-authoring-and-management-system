@@ -68,6 +68,7 @@ This is the most important thirty seconds of the demo:
   renumbers again.
 - Press **Tab** on the new clause to indent it to 3.1.1, **Shift+Tab** to outdent.
 - Select some text and hit **B** for bold, or add a link.
+- **+ Insert** adds a heading, paragraph or table wherever you're working.
 
 Clause numbers are never stored — they're derived from the document structure on every render.
 That's why this can't drift out of sync.
@@ -75,12 +76,12 @@ That's why this can't drift out of sync.
 Open the **Annexures** panel on the right: three annexures on this agreement, each its own
 editable document. Click one to edit it, add one, reorder them.
 
-Hit **Preview** to see exactly what the learner sees in the app at enrollment.
+Hit **Preview**. It opens on **Learner view** — exactly what the student sees in the app at
+enrollment — and its second tab, **Changes vs live**, diffs your draft against the published
+version. Same question, one place: is this ready to publish?
 
 ### 4 · The decision legal actually cares about — Publish
-Click **Compare with live** first to show the diff of your draft against v3.
-
-Then **Publish v4**:
+**Publish v4**:
 - Try to publish with an empty change summary — it's required and the form says so.
 - Fill it in, then choose between **New enrollments only** and **Apply retroactively — trigger
   re-consent**.

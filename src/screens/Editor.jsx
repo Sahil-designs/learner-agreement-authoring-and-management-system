@@ -8,7 +8,7 @@ import {
 } from '../state/selectors.js'
 import { diffDocuments, documentDiffStats, documentHasChanges } from '../lib/doc.js'
 import { fmtDateTime, fmtNumber, fmtRelative, fmtVersion } from '../lib/format.js'
-import { Badge, StatusBadge, Modal, EmptyState } from '../components/Ui.jsx'
+import { Badge, StatusBadge, Modal, EmptyState, Segmented } from '../components/Ui.jsx'
 import { DocEditor, AnnexurePanel, useDocEditing } from '../components/DocEditor.jsx'
 import { DocView } from '../components/DocView.jsx'
 import { DiffView, DiffStats } from '../components/DiffView.jsx'
@@ -136,36 +136,29 @@ function EditorInner({ agreement, state, dispatch, user, navigate, route }) {
         </div>
       </div>
 
+      <div className="metastack">
       <div className="metastrip">
         <div className="metastrip-item">
-          <span className="metastrip-label">Current version</span>
+          <span className="metastrip-label">Version</span>
           <span className="metastrip-value">
             {fmtVersion(status.liveVersionNumber)}
             <StatusBadge status={status} />
+            {dirty && <Badge tone="amber">Unsaved</Badge>}
           </span>
         </div>
         <div className="metastrip-item">
           <span className="metastrip-label">Editing</span>
           <span className="metastrip-value">
-            {draft ? `Draft based on ${draft.baseVersion ? `v${draft.baseVersion}` : 'a blank document'}` : `Working copy of ${fmtVersion(status.liveVersionNumber)}`}
-            {dirty && <Badge tone="amber">Unsaved changes</Badge>}
+            {draft
+              ? `Draft on v${draft.baseVersion ?? '—'} · saved ${fmtRelative(draft.savedAt)} by ${userName(draft.savedBy)}`
+              : `Working copy of ${fmtVersion(status.liveVersionNumber)} · not saved yet`}
           </span>
-        </div>
-        <div className="metastrip-item">
-          <span className="metastrip-label">Last saved</span>
-          <span className="metastrip-value">
-            {draft?.savedAt ? `${fmtRelative(draft.savedAt)} by ${userName(draft.savedBy)}` : '— not saved yet'}
-          </span>
-        </div>
-        <div className="metastrip-item">
-          <span className="metastrip-label">Editing user</span>
-          <span className="metastrip-value">{user.name} <span className="muted small">· {user.title}</span></span>
         </div>
 
         <div className="metastrip-actions">
-          <button className="btn" onClick={() => { setDoc(readLatest(doc)); setModal('compare') }}>
-            Compare with live
-          </button>
+          {/* "Preview" and "Compare with live" were two buttons for the same
+              instinct -- look at it before publishing. They are now two tabs of
+              one modal. */}
           <button className="btn" onClick={() => { setDoc(readLatest(doc)); setModal('preview') }}>Preview</button>
           {canEdit && (
             <>
@@ -182,7 +175,6 @@ function EditorInner({ agreement, state, dispatch, user, navigate, route }) {
       {canEdit && draft && (
         <ApprovalBar
           draft={draft}
-          user={user}
           submittedByMe={submittedByMe}
           awaiting={awaitingApproval}
           onSubmit={() => dispatch({ type: 'SUBMIT_FOR_APPROVAL', agreementId: agreement.id })}
@@ -195,6 +187,7 @@ function EditorInner({ agreement, state, dispatch, user, navigate, route }) {
           }}
         />
       )}
+      </div>
 
       <div className={`editor-layout${pinned ? ' editor-layout-wide' : ''}`}>
         <DocEditor
@@ -220,17 +213,6 @@ function EditorInner({ agreement, state, dispatch, user, navigate, route }) {
             onSelect={setActiveAnnexureId}
             readLatest={readLatest}
           />
-
-          <div className="panel">
-            <div className="panel-head"><h4>How versioning works here</h4></div>
-            <div className="panel-body">
-              <p className="panel-note">
-                Editing only ever touches the draft. Publishing appends a new version — it never
-                rewrites an existing one, so a learner stays bound to the exact version they accepted
-                at enrollment unless you publish retroactively and they accept again.
-              </p>
-            </div>
-          </div>
         </div>
       </div>
 
@@ -242,29 +224,10 @@ function EditorInner({ agreement, state, dispatch, user, navigate, route }) {
           // naming a version number that doesn't exist yet.
           version={draft || dirty ? nextVersion : status.liveVersionNumber}
           isDraft={!!draft || dirty}
+          live={live}
+          diff={draftDiff}
           onClose={() => setModal(null)}
         />
-      )}
-
-      {modal === 'compare' && (
-        <Modal
-          title="Draft compared with the live version"
-          subtitle={live ? `${fmtVersion(live.version)} → working draft` : 'This agreement has never been published.'}
-          size="modal-xl"
-          onClose={() => setModal(null)}
-          footer={<button className="btn" onClick={() => setModal(null)}>Close</button>}
-        >
-          {documentHasChanges(draftDiff) ? (
-            <>
-              <div className="mb-16"><DiffStats stats={documentDiffStats(draftDiff)} /></div>
-              <DiffView diff={draftDiff} leftLabel={live ? `v${live.version} (live)` : 'Empty'} rightLabel="Working draft" />
-            </>
-          ) : (
-            <EmptyState icon="＝" title="No differences yet">
-              The draft is identical to the live version. Make an edit and compare again.
-            </EmptyState>
-          )}
-        </Modal>
       )}
 
       {modal === 'publish' && (
@@ -285,51 +248,38 @@ function EditorInner({ agreement, state, dispatch, user, navigate, route }) {
 }
 
 function ApprovalBar({ draft, submittedByMe, awaiting, onSubmit, onApprove, onDiscard }) {
+  const discard = <button className="btn btn-sm btn-ghost btn-danger" onClick={onDiscard}>Discard</button>
+
   if (draft.approvedBy) {
     return (
-      <div className="callout mb-16" style={{ borderLeftColor: 'var(--green)', background: 'var(--green-soft)', borderColor: '#bfe3cf' }}>
-        <div className="row">
-          <span>
-            ✓ Approved by <strong>{userName(draft.approvedBy.by)}</strong> on {fmtDateTime(draft.approvedBy.at)}.
-            This draft can be published.
-          </span>
-          <div className="spacer" />
-          <button className="btn btn-sm btn-danger" onClick={onDiscard}>Discard draft</button>
-        </div>
+      <div className="approvalbar approvalbar-green">
+        <span>✓ Approved by <strong>{userName(draft.approvedBy.by)}</strong> · ready to publish</span>
+        <div className="spacer" />
+        {discard}
       </div>
     )
   }
 
   if (awaiting) {
     return (
-      <div className="callout callout-amber mb-16">
-        <div className="row row-wrap">
-          <span>
-            Submitted for approval by <strong>{userName(draft.submittedForApproval.by)}</strong> on{' '}
-            {fmtDateTime(draft.submittedForApproval.at)}.
-            {submittedByMe
-              ? ' A different legal owner has to approve it before it can be published — switch role in the dev panel to demo this.'
-              : ' You can approve it.'}
-          </span>
-          <div className="spacer" />
-          {!submittedByMe && <button className="btn btn-sm btn-primary" onClick={onApprove}>Approve draft</button>}
-          <button className="btn btn-sm btn-danger" onClick={onDiscard}>Discard draft</button>
-        </div>
+      <div className="approvalbar approvalbar-amber">
+        <span>
+          Awaiting approval · submitted by <strong>{userName(draft.submittedForApproval.by)}</strong>
+          {submittedByMe && ' — a second legal owner must approve before it can be published'}
+        </span>
+        <div className="spacer" />
+        {!submittedByMe && <button className="btn btn-sm btn-primary" onClick={onApprove}>Approve</button>}
+        {discard}
       </div>
     )
   }
 
   return (
-    <div className="callout mb-16">
-      <div className="row row-wrap">
-        <span>
-          Unpublished draft, last saved {fmtRelative(draft.savedAt)} by <strong>{userName(draft.savedBy)}</strong>.
-          Publish it directly, or send it for a second pair of eyes first.
-        </span>
-        <div className="spacer" />
-        <button className="btn btn-sm" onClick={onSubmit}>Submit for approval</button>
-        <button className="btn btn-sm btn-danger" onClick={onDiscard}>Discard draft</button>
-      </div>
+    <div className="approvalbar">
+      <span className="muted">Not submitted for approval — you can publish directly, or get a second pair of eyes.</span>
+      <div className="spacer" />
+      <button className="btn btn-sm" onClick={onSubmit}>Submit for approval</button>
+      {discard}
     </div>
   )
 }
@@ -374,53 +324,88 @@ function PinnedRequest({ request, onClose, onDone }) {
   )
 }
 
-function PreviewModal({ agreement, doc, version, isDraft, onClose }) {
+/**
+ * One modal for both "how does this read to a learner" and "what did I change".
+ * They were separate buttons, but they answer the same question -- is this
+ * ready to publish -- so they are tabs of one view.
+ */
+function PreviewModal({ agreement, doc, version, isDraft, live, diff, onClose }) {
+  const [tab, setTab] = useState('learner')
+  const changed = diff && documentHasChanges(diff)
+
   return (
     <Modal
-      title="Learner preview"
+      title={agreement.name}
       subtitle={
         isDraft
-          ? `How the working draft would appear to a learner — it would publish as v${version}.`
-          : `How the live version (v${version}) appears to a learner at the point of enrollment.`
+          ? `Working draft — would publish as v${version}.`
+          : `Live version (v${version}), as a learner sees it at enrollment.`
       }
-      size="modal-lg"
+      size="modal-xl"
       onClose={onClose}
       footer={
         <>
           <span className="modal-foot-note">
-            Preview only — the learner-side viewer itself is outside this prototype's scope.
+            {tab === 'learner'
+              ? 'Preview only — the learner-side viewer itself is outside this prototype’s scope.'
+              : `v${live?.version ?? '—'} stays exactly as it is until you publish.`}
           </span>
-          <button className="btn btn-primary" onClick={onClose}>Close preview</button>
+          <button className="btn btn-primary" onClick={onClose}>Close</button>
         </>
       }
     >
-      <div className="learner-frame">
-        <div className="learner-device">
-          <div className="learner-bar">
-            <span>📘</span>
-            <span>{agreement.name}</span>
-          </div>
-          <div className="learner-body">
-            <DocView doc={doc} />
-          </div>
-          <div className="learner-scroll-note">scroll to the end to continue</div>
-          <div className="learner-accept">
-            <label className="learner-check">
-              <input type="checkbox" disabled />
-              <span>
-                I have read and accept the terms of this Agreement, including the refund and
-                cancellation terms in Part C.
-              </span>
-            </label>
-            <button className="btn btn-primary" disabled>Accept and continue</button>
-            <div className="learner-version-note">
-              {isDraft
-                ? `A learner accepting this would be bound to v${version} for the lifetime of their enrollment.`
-                : `Learners enrolling today accept v${version} and stay bound to it for the lifetime of their enrollment.`}
+      <div className="diff-controls">
+        <Segmented
+          value={tab}
+          onChange={setTab}
+          options={[
+            { value: 'learner', label: 'Learner view' },
+            { value: 'changes', label: changed ? 'Changes vs live' : 'Changes vs live (none)' },
+          ]}
+        />
+        {tab === 'changes' && changed && (
+          <>
+            <div className="spacer" />
+            <DiffStats stats={documentDiffStats(diff)} />
+          </>
+        )}
+      </div>
+
+      {tab === 'learner' ? (
+        <div className="learner-frame">
+          <div className="learner-device">
+            <div className="learner-bar">
+              <span>📘</span>
+              <span>{agreement.name}</span>
+            </div>
+            <div className="learner-body">
+              <DocView doc={doc} />
+            </div>
+            <div className="learner-scroll-note">scroll to the end to continue</div>
+            <div className="learner-accept">
+              <label className="learner-check">
+                <input type="checkbox" disabled />
+                <span>
+                  I have read and accept the terms of this Agreement, including the refund and
+                  cancellation terms in Part C.
+                </span>
+              </label>
+              <button className="btn btn-primary" disabled>Accept and continue</button>
+              <div className="learner-version-note">
+                {isDraft
+                  ? `A learner accepting this would be bound to v${version} for the lifetime of their enrollment.`
+                  : `Learners enrolling today accept v${version} and stay bound to it for the lifetime of their enrollment.`}
+              </div>
             </div>
           </div>
         </div>
-      </div>
+      ) : changed ? (
+        <DiffView diff={diff} leftLabel={live ? `v${live.version} (live)` : 'Empty'} rightLabel="Working draft" />
+      ) : (
+        <EmptyState icon="＝" title="Nothing has changed yet">
+          This draft is identical to the live version. Edit a clause and look again.
+        </EmptyState>
+      )}
     </Modal>
   )
 }

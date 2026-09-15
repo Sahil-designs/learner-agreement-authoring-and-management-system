@@ -7,7 +7,7 @@
 // and immediately before any structural change. That removes the entire class
 // of caret-jump bugs that contentEditable-in-React is famous for.
 
-import { memo, useEffect, useRef } from 'react'
+import { memo, useEffect, useRef, useState } from 'react'
 
 /** True when the current selection sits inside `el`. */
 function selectionInside(el) {
@@ -77,7 +77,9 @@ export { selectionInside, caretAtStart }
  * editable, the selection collapses, and Bold silently does nothing -- the
  * single most likely way a live editing demo falls over.
  */
-export function EditorToolbar({ canEdit, surfaceRef, onInsert, onIndent, onOutdent, hasFocus, focusedLevel }) {
+export function EditorToolbar({ canEdit, surfaceRef, onInsert }) {
+  const [menuOpen, setMenuOpen] = useState(false)
+
   const exec = (cmd, arg) => {
     if (!canEdit) return
     if (!selectionInside(surfaceRef.current)) return
@@ -97,25 +99,47 @@ export function EditorToolbar({ canEdit, surfaceRef, onInsert, onIndent, onOutde
     if (url) document.execCommand('createLink', false, url)
   }
 
+  const insert = (type, level) => {
+    setMenuOpen(false)
+    onInsert(type, level)
+  }
+
+  // Indent and outdent are not here on purpose: the per-block gutter offers
+  // them on the block they apply to, and Tab / Shift+Tab do the same. Two
+  // toolbar buttons that sit disabled until something is focused were noise.
   return (
     <div className="toolbar">
       <button className="tool tool-b" onMouseDown={swallow} onClick={() => exec('bold')} disabled={!canEdit} title="Bold (Ctrl+B)">B</button>
       <button className="tool tool-i" onMouseDown={swallow} onClick={() => exec('italic')} disabled={!canEdit} title="Italic (Ctrl+I)">I</button>
       <button className="tool" onMouseDown={swallow} onClick={link} disabled={!canEdit} title="Insert link">🔗</button>
-      <button className="tool" onMouseDown={swallow} onClick={() => exec('removeFormat')} disabled={!canEdit} title="Clear formatting">⌫ format</button>
+      <button className="tool" onMouseDown={swallow} onClick={() => exec('removeFormat')} disabled={!canEdit} title="Clear formatting">Clear</button>
 
       <span className="tool-sep" />
 
-      <button className="tool" onMouseDown={swallow} onClick={() => onInsert('heading')} disabled={!canEdit}>+ Heading</button>
-      <button className="tool" onMouseDown={swallow} onClick={() => onInsert('clause', 1)} disabled={!canEdit}>+ Clause</button>
-      <button className="tool" onMouseDown={swallow} onClick={() => onInsert('clause', 2)} disabled={!canEdit}>+ Sub-clause</button>
-      <button className="tool" onMouseDown={swallow} onClick={() => onInsert('para')} disabled={!canEdit}>+ Paragraph</button>
-      <button className="tool" onMouseDown={swallow} onClick={() => onInsert('table')} disabled={!canEdit}>+ Table</button>
+      <div className="toolmenu" onBlur={(e) => { if (!e.currentTarget.contains(e.relatedTarget)) setMenuOpen(false) }}>
+        <button
+          className={`tool${menuOpen ? ' active' : ''}`}
+          onMouseDown={swallow}
+          onClick={() => setMenuOpen((o) => !o)}
+          disabled={!canEdit}
+          aria-expanded={menuOpen}
+        >
+          + Insert ▾
+        </button>
+        {menuOpen && (
+          <div className="toolmenu-list">
+            <button onMouseDown={swallow} onClick={() => insert('clause', 1)}>Clause</button>
+            <button onMouseDown={swallow} onClick={() => insert('clause', 2)}>Sub-clause</button>
+            <button onMouseDown={swallow} onClick={() => insert('heading')}>Section heading</button>
+            <button onMouseDown={swallow} onClick={() => insert('para')}>Paragraph</button>
+            <button onMouseDown={swallow} onClick={() => insert('table')}>Table</button>
+          </div>
+        )}
+      </div>
 
-      <span className="tool-sep" />
-
-      <button className="tool" onMouseDown={swallow} onClick={onOutdent} disabled={!canEdit || !hasFocus || focusedLevel <= 1} title="Outdent (Shift+Tab)">⇤ Outdent</button>
-      <button className="tool" onMouseDown={swallow} onClick={onIndent} disabled={!canEdit || !hasFocus || focusedLevel >= 3} title="Indent (Tab)">⇥ Indent</button>
+      <span className="toolbar-hint">
+        Hover any clause for move, indent and delete · Tab and Shift+Tab to indent
+      </span>
     </div>
   )
 }
